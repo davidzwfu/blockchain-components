@@ -28,18 +28,37 @@ module.exports = {
       {
         selector: 'typeParameter',
         format: ['PascalCase'],
-        prefix: ['T', 'U'],
+        prefix: ['A', 'MPS', 'MCS', 'S', 'T', 'U'],
       },
     ],
     'import/order': [
       'error',
       {
+        alphabetize: {
+          // Sort imports alphabetically in scending order.
+          order: 'asc',
+          // Ignore case when sorting imports.
+          caseInsensitive: true,
+        },
         pathGroups: [
           {
             pattern: 'shared',
             group: 'external',
           },
         ],
+        /**
+         * import fs from 'fs';
+         *
+         * import package from 'npm-package';
+         *
+         * import xyz from '~/project-file';
+         *
+         * import index from '../';
+         *
+         * import sibling from './foo';
+         */
+        groups: ['builtin', 'external', 'parent', 'sibling', 'internal'],
+        'newlines-between': 'always',
       },
     ],
     'no-catch-shadow': 'off',

@@ -1,16 +1,19 @@
 import {Rainbow as rainbowIcon} from 'shared';
 
-import {ConnectorInstance, ConnectorProps} from '../types/connector';
-import {getBrowserInfo} from '../utils/getBrowser';
-
 import {buildWalletConnectConnector} from './buildWalletConnectConnector';
 
-export const Rainbow = ({chains}: ConnectorProps): ConnectorInstance => {
+import {ConnectorInstance, ConnectorProps} from '~/types/connector';
+import {getBrowserInfo} from '~/utils/getBrowser';
+
+export const Rainbow = ({
+  chains,
+  projectId,
+}: ConnectorProps): ConnectorInstance => {
   const {mobilePlatform} = getBrowserInfo();
 
   return {
     createConnector: () => {
-      const connector = buildWalletConnectConnector({chains});
+      const connector = buildWalletConnectConnector({chains, projectId});
 
       return connector;
     },

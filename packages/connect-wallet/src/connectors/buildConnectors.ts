@@ -1,18 +1,18 @@
 import type {Connector as WagmiConnector} from 'wagmi';
 
-import type {
-  Connector,
-  ConnectorInstance,
-  ConnectorProps,
-  CustomConnector,
-} from '../types/connector';
-import {ConnectWalletError} from '../utils/error';
-
 import {Coinbase} from './coinbase';
 import {LedgerLive} from './ledgerLive';
 import {MetaMask} from './metaMask';
 import {Rainbow} from './rainbow';
 import {WalletConnect} from './walletConnect';
+
+import type {
+  Connector,
+  ConnectorInstance,
+  ConnectorProps,
+  CustomConnector,
+} from '~/types/connector';
+import {ConnectWalletError} from '~/utils/error';
 
 interface BuildConnectorsWithDefaults extends ConnectorProps {
   customConnectors?: CustomConnector[];
@@ -45,6 +45,7 @@ export const buildConnectors = ({
   customConnectors,
   excludedConnectors,
   includeDefaults = true,
+  projectId,
 }: BuildConnectorsProps): BuildConnectorsSignature => {
   const connectors: Connector[] = customConnectors || [];
 
@@ -66,11 +67,11 @@ export const buildConnectors = ({
   }
 
   const defaultAvailableConnectors = [
-    MetaMask({chains}),
-    Coinbase({appName, chains}),
-    Rainbow({chains}),
-    LedgerLive({chains}),
-    WalletConnect({chains}),
+    MetaMask({chains, projectId}),
+    Coinbase({appName, chains, projectId}),
+    Rainbow({chains, projectId}),
+    LedgerLive({chains, projectId}),
+    WalletConnect({chains, projectId}),
   ];
 
   defaultAvailableConnectors.forEach(
@@ -85,9 +86,7 @@ export const buildConnectors = ({
 
       const createdConnector = createConnector();
 
-      const isWalletConnect = createdConnector.id === 'walletConnect';
-
-      if (isWalletConnect) {
+      if (createdConnector.id === 'walletConnect') {
         /**
          * Since we're reusing wallet connect connectors we should check if
          * this connector is already inside of connectors.

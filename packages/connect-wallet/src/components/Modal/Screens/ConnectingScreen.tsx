@@ -3,22 +3,24 @@ import {useCallback, useMemo} from 'react';
 import {Button, Spinner, Text} from 'shared';
 
 import {ConnectorIcon} from '../../ConnectorIcon';
-import {useAppDispatch, useAppSelector} from '../../../hooks/useAppState';
-import {useConnect} from '../../../hooks/useConnect';
-import {useConnectorData} from '../../../hooks/useConnectorData';
-import {useModalScreenContent} from '../../../hooks/useModalContent';
-import {useTranslation} from '../../../hooks/useTranslation';
-import {navigate} from '../../../slices/modalSlice';
-import {ConnectionState} from '../../../types/connectionState';
-import {getBrowserInfo} from '../../../utils/getBrowser';
+
+import {
+  useConnect,
+  useConnectorData,
+  useModalScreenContent,
+  useTranslation,
+} from '~/hooks';
+import {useStore} from '~/state';
+import {ConnectionState} from '~/types/connectionState';
+import {getBrowserInfo} from '~/utils/getBrowser';
 
 const ERROR_STATES: ConnectionState[] = ['Failed', 'Unavailable'];
 const TRY_AGAIN_STATES: ConnectionState[] = ['Failed', 'Rejected'];
 
 const ConnectingScreen = () => {
-  const dispatch = useAppDispatch();
-  const {connectionStatus} = useAppSelector((state) => state.modal);
-  const {pendingConnector} = useAppSelector((state) => state.wallet);
+  const [{connectionStatus, navigate}, {pendingConnector}] = useStore(
+    (state) => [state.modal, state.wallet],
+  );
   const {connect} = useConnect();
   const {connector, qrCodeSupported} = useConnectorData({
     id: pendingConnector?.id,
@@ -32,8 +34,8 @@ const ConnectingScreen = () => {
   const {mobilePlatform} = getBrowserInfo();
 
   const handleUseQRCode = useCallback(() => {
-    dispatch(navigate('Scan'));
-  }, [dispatch]);
+    navigate('Scan');
+  }, [navigate]);
 
   const buttons = useMemo(() => {
     const hasButtons = canTryAgain || (!mobilePlatform && qrCodeSupported);
@@ -90,7 +92,7 @@ const ConnectingScreen = () => {
       <div className="sbc-block">
         <Text
           as="h3"
-          className="sbc-mt-0 sbc-mb-2 sbc-text-center"
+          className="sbc-mb-2 sbc-mt-0 sbc-text-center"
           color="primary"
           variant="headingLg"
         >

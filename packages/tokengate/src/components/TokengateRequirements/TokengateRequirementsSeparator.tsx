@@ -1,8 +1,8 @@
 import {Text} from 'shared';
 
-import {Requirements} from '../../types';
+import {Requirements} from '~/types';
 
-const TokengateRequirementsSeparator = ({
+export const TokengateRequirementsSeparator = ({
   logic,
 }: {
   logic?: Requirements['logic'];
@@ -25,5 +25,3 @@ const TokengateRequirementsSeparator = ({
     </div>
   );
 };
-
-export {TokengateRequirementsSeparator};

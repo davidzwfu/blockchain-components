@@ -2,15 +2,12 @@ import {useCallback} from 'react';
 import {Text, DelegateCash} from 'shared';
 
 import {ConnectorButton} from '../../ConnectorButton';
-import {useAppDispatch} from '../../../hooks/useAppState';
-import {useConnect} from '../../../hooks/useConnect';
-import {useTranslation} from '../../../hooks/useTranslation';
-import {useWalletConnectDeeplink} from '../../../hooks/useWalletConnectDeeplink';
-import {closeModal, navigate} from '../../../slices/modalSlice';
-import {setPendingConnector} from '../../../slices/walletSlice';
-import {Connector} from '../../../types/connector';
-import {getBrowserInfo} from '../../../utils/getBrowser';
-import {isInstalled} from '../../../utils/isInstalled';
+
+import {useConnect, useTranslation, useWalletConnectDeeplink} from '~/hooks';
+import {useStore} from '~/state';
+import {Connector} from '~/types/connector';
+import {getBrowserInfo} from '~/utils/getBrowser';
+import {isInstalled} from '~/utils/isInstalled';
 
 interface ConnectScreenProps {
   connectors: Connector[];
@@ -21,7 +18,10 @@ const ConnectScreen = ({
   connectors,
   enableDelegateCash,
 }: ConnectScreenProps) => {
-  const dispatch = useAppDispatch();
+  const [{closeModal, navigate}, {setPendingConnector}] = useStore((state) => [
+    state.modal,
+    state.wallet,
+  ]);
   const {connect} = useConnect();
   const {t} = useTranslation('ConnectScreen');
   const {connectUsingWalletConnect} = useWalletConnectDeeplink();
@@ -43,19 +43,17 @@ const ConnectScreen = ({
       /**
        * This is destructured intentionally.
        *
-       * With Redux we cannot store non-serialized data, meaning that
+       * We cannot store non-serialized data, meaning that
        * anything which is constructed (e.g. a Connector from Wagmi)
        */
-      dispatch(
-        setPendingConnector({
-          desktopAppLink,
-          id,
-          marketingSite,
-          mobileAppPrefixes,
-          name,
-          qrCodeSupported,
-        }),
-      );
+      setPendingConnector({
+        desktopAppLink,
+        id,
+        marketingSite,
+        mobileAppPrefixes,
+        name,
+        qrCodeSupported,
+      });
 
       connect({connector: wagmiConnector});
 
@@ -78,7 +76,7 @@ const ConnectScreen = ({
         !mobilePlatform;
 
       if (shouldUseScanScreen) {
-        dispatch(navigate('Scan'));
+        navigate('Scan');
         return;
       }
 
@@ -90,7 +88,7 @@ const ConnectScreen = ({
       const shouldCloseModal = isWalletConnect && mobilePlatform;
 
       if (shouldCloseModal) {
-        dispatch(closeModal());
+        closeModal();
         return;
       }
 
@@ -101,14 +99,21 @@ const ConnectScreen = ({
         connectUsingWalletConnect(connector);
       }
 
-      dispatch(navigate('Connecting'));
+      navigate('Connecting');
     },
-    [connect, connectUsingWalletConnect, dispatch, mobilePlatform],
+    [
+      closeModal,
+      connect,
+      connectUsingWalletConnect,
+      mobilePlatform,
+      navigate,
+      setPendingConnector,
+    ],
   );
 
   const handleNavigateDelegateWallets = useCallback(() => {
-    dispatch(navigate('DelegateWallets'));
-  }, [dispatch]);
+    navigate('DelegateWallets');
+  }, [navigate]);
 
   return (
     <div className="sbc-flex sbc-flex-col sbc-justify-center sbc-gap-y-3 sbc-p-popover sbc-pt-0">

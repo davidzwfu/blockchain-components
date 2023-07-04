@@ -1,31 +1,25 @@
 import {WalletConnect as walletConnectIcon} from 'shared';
 
-import {ConnectorInstance, ConnectorProps} from '../types/connector';
-import {getBrowserInfo} from '../utils/getBrowser';
-
 import {buildWalletConnectConnector} from './buildWalletConnectConnector';
 
-export const WalletConnect = ({chains}: ConnectorProps): ConnectorInstance => {
-  const {mobilePlatform} = getBrowserInfo();
+import {ConnectorInstance, ConnectorProps} from '~/types/connector';
+import {getBrowserInfo} from '~/utils/getBrowser';
 
-  const supportedWalletConnectWallets = [
-    'Rainbow',
-    'Ledger',
-    'Trezor',
-    'Trust Wallet',
-    'Argent',
-    'Safe',
-  ];
+export const WalletConnect = ({
+  chains,
+  projectId,
+}: ConnectorProps): ConnectorInstance => {
+  const {mobilePlatform} = getBrowserInfo();
 
   const standardConnector = buildWalletConnectConnector({
     chains,
-    mobileLinks: supportedWalletConnectWallets,
     /**
      * This prop disables/enables the WalletConnect modal usage.
      * On desktop, we support connecting via WC via either scan
      * or by using the WC modal. On mobile we only support
      * connecting via the WC modal.
      */
+    projectId,
     qrcode: Boolean(mobilePlatform),
   });
 
@@ -38,7 +32,7 @@ export const WalletConnect = ({chains}: ConnectorProps): ConnectorInstance => {
     ? undefined
     : buildWalletConnectConnector({
         chains,
-        mobileLinks: supportedWalletConnectWallets,
+        projectId,
         qrcode: true,
       });
 

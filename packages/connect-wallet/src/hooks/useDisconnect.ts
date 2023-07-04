@@ -2,16 +2,13 @@ import {publishEvent, eventNames} from '@shopify/blockchain-components';
 import {useCallback} from 'react';
 import {useDisconnect as wagmiUseDisconnect, useAccount} from 'wagmi';
 
-import {removeWallet, setActiveWallet} from '../slices/walletSlice';
-
-import {useAppDispatch, useAppSelector} from './useAppState';
+import {useStore} from '~/state';
+import {ConnectWalletError} from '~/utils/error';
 
 export const useDisconnect = () => {
-  const dispatch = useAppDispatch();
+  const {activeWallet, connectedWallets, removeWallet, setActiveWallet} =
+    useStore((state) => state.wallet);
   const {disconnect} = wagmiUseDisconnect();
-  const {activeWallet, connectedWallets} = useAppSelector(
-    (state) => state.wallet,
-  );
 
   const {address: connectedAddress} = useAccount({
     onDisconnect: () => {
@@ -27,10 +24,11 @@ export const useDisconnect = () => {
          * activeWallet to undefined for us and we don't want to
          * dispatch onDisconnect numerous times.
          */
-        return dispatch(removeWallet(activeWallet));
+        removeWallet(activeWallet);
+        return;
       }
 
-      dispatch(setActiveWallet(undefined));
+      setActiveWallet(undefined);
     },
   });
 
@@ -42,8 +40,10 @@ export const useDisconnect = () => {
       });
 
       if (!addressToDisconnect) {
-        throw new Error(
-          'There is not a connected wallet nor was a wallet address provided to the disconnect function.',
+        console.error(
+          new ConnectWalletError(
+            'There is not a connected wallet nor was a wallet address provided to the disconnect function',
+          ),
         );
       }
 
@@ -63,7 +63,7 @@ export const useDisconnect = () => {
       );
 
       if (walletToDisconnect) {
-        dispatch(removeWallet(walletToDisconnect));
+        removeWallet(walletToDisconnect);
       }
 
       /**
@@ -74,7 +74,8 @@ export const useDisconnect = () => {
         disconnect();
       }
     },
-    [connectedAddress, connectedWallets, disconnect, dispatch],
+    [connectedAddress, connectedWallets, disconnect, removeWallet],
   );
+
   return {disconnect: handleDisconnect};
 };

@@ -3,30 +3,28 @@ import {useCallback, useMemo} from 'react';
 import {Button, Spinner, Text} from 'shared';
 
 import {ConnectorIcon} from '../../ConnectorIcon';
-import {useAppDispatch, useAppSelector} from '../../../hooks/useAppState';
-import {useDisconnect} from '../../../hooks/useDisconnect';
-import {useSignMessage} from '../../../hooks/useSignMessage';
-import {useTranslation} from '../../../hooks/useTranslation';
-import {closeModal, setError} from '../../../slices/modalSlice';
+
+import {useDisconnect, useSignMessage, useTranslation} from '~/hooks';
+import {useStore} from '~/state';
 
 const SignatureScreen = () => {
-  const dispatch = useAppDispatch();
-  const {error, signing} = useAppSelector((state) => state.modal);
-  const {pendingWallet} = useAppSelector((state) => state.wallet);
+  const [{closeModal, error, setError, signing}, {pendingWallet}] = useStore(
+    (state) => [state.modal, state.wallet],
+  );
   const {disconnect} = useDisconnect();
   const {signMessage} = useSignMessage();
   const {t} = useTranslation('Screens');
 
   const handleSignMessage = useCallback(() => {
     if (!pendingWallet) {
-      dispatch(closeModal());
+      closeModal();
       disconnect();
       return;
     }
 
-    dispatch(setError());
+    setError();
     signMessage(pendingWallet);
-  }, [disconnect, dispatch, pendingWallet, signMessage]);
+  }, [closeModal, disconnect, pendingWallet, setError, signMessage]);
 
   const isCriticalError =
     error !== undefined && error.name !== 'UserRejectedRequestError';
@@ -65,7 +63,7 @@ const SignatureScreen = () => {
       <div className="sbc-block">
         <Text
           as="h3"
-          className="sbc-mt-0 sbc-mb-2 sbc-text-center"
+          className="sbc-mb-2 sbc-mt-0 sbc-text-center"
           color="primary"
           variant="headingLg"
         >

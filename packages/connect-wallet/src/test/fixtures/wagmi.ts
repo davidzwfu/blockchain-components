@@ -1,12 +1,12 @@
+import {Chain, configureChains, createConfig, mainnet} from 'wagmi';
+import {publicProvider} from 'wagmi/providers/public';
+
 import {
   buildConnectors,
   BuildConnectorsProps,
-} from 'src/connectors/buildConnectors';
-import {Chain, configureChains, createClient} from 'wagmi';
-import {mainnet} from 'wagmi/chains';
-import {publicProvider} from 'wagmi/providers/public';
+} from '~/connectors/buildConnectors';
 
-type WagmiFixtureProps = Omit<BuildConnectorsProps, 'chains'> & {
+type WagmiFixtureProps = Omit<BuildConnectorsProps, 'chains' | 'projectId'> & {
   chains?: Chain[];
 };
 
@@ -16,7 +16,7 @@ export const createWagmiFixture = ({
   customConnectors,
   excludedConnectors = ['coinbaseWallet'],
 }: WagmiFixtureProps) => {
-  const {provider, webSocketProvider} = configureChains(chains, [
+  const {publicClient, webSocketPublicClient} = configureChains(chains, [
     publicProvider(),
   ]);
 
@@ -25,14 +25,15 @@ export const createWagmiFixture = ({
     chains,
     customConnectors,
     excludedConnectors,
+    projectId: '',
   });
 
-  const client = createClient({
+  const config = createConfig({
     autoConnect: true,
     connectors: wagmiConnectors,
-    provider,
-    webSocketProvider,
+    publicClient,
+    webSocketPublicClient,
   });
 
-  return {chains, client, connectors};
+  return {chains, config, connectors};
 };

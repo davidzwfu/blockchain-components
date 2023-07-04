@@ -1,7 +1,7 @@
-import {Chain} from '@wagmi/core';
+import {Chain} from 'wagmi';
 
-import {Connector} from '../../types/connector';
-import {OrderAttributionMode} from '../../types/orderAttribution';
+import {Connector} from '~/types/connector';
+import {OrderAttributionMode} from '~/types/orderAttribution';
 
 interface StatementGeneratorProps {
   /**
@@ -62,9 +62,16 @@ interface EnableDelegateCashProps {
   enableDelegateCash?: boolean;
 }
 
+interface CustomizationProps {
+  customTitles?: {
+    connectScreenHeader?: string;
+  };
+}
+
 export type ProviderProps = (
   | SignatureRequiredProps
   | SignatureNotRequiredProps
 ) &
   OrderAttributionModeProps &
-  EnableDelegateCashProps;
+  EnableDelegateCashProps &
+  CustomizationProps;

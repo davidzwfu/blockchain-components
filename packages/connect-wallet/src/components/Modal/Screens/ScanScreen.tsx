@@ -3,17 +3,16 @@ import {AnimatePresence, domAnimation, LazyMotion} from 'framer-motion';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {Button} from 'shared';
 
-import {useAppDispatch, useAppSelector} from '../../../hooks/useAppState';
-import {useConnect} from '../../../hooks/useConnect';
-import {useConnectorData} from '../../../hooks/useConnectorData';
-import {useTranslation} from '../../../hooks/useTranslation';
 import {QRCode, QRCodeSkeleton} from '../../QRCode';
-import {closeModal} from '../../../slices/modalSlice';
-import {cleanupConnection} from '../../../utils/cleanupConnection';
+
+import {useConnect, useConnectorData, useTranslation} from '~/hooks';
+import {useStore} from '~/state';
 
 const ScanScreen = () => {
-  const dispatch = useAppDispatch();
-  const {pendingConnector} = useAppSelector((state) => state.wallet);
+  const [{closeModal}, {pendingConnector}] = useStore((state) => [
+    state.modal,
+    state.wallet,
+  ]);
   const {connect} = useConnect();
   const {connector, marketingSite, modalConnector, name, qrCodeSupported} =
     useConnectorData({
@@ -28,15 +27,13 @@ const ScanScreen = () => {
     }
 
     connect({connector: modalConnector});
-    dispatch(closeModal());
-  }, [connect, dispatch, modalConnector]);
+    closeModal();
+  }, [closeModal, connect, modalConnector]);
 
   const buttons = useMemo(() => {
+    const isWalletConnect = connector?.id === 'walletConnect';
     const hasGetProductButton = Boolean(marketingSite);
-    const hasWalletConnectButton = Boolean(
-      connector?.id === 'walletConnect' && modalConnector,
-    );
-
+    const hasWalletConnectButton = Boolean(isWalletConnect && modalConnector);
     const hasButtons = hasGetProductButton || hasWalletConnectButton;
 
     if (!hasButtons) {
@@ -124,11 +121,15 @@ const ScanScreen = () => {
 
         const provider = await connector.getProvider();
 
-        setQRCodeURI(
-          connector.id === 'coinbaseWallet'
-            ? provider.qrUrl
-            : provider.connector.uri,
-        );
+        if (connector.id === 'coinbaseWallet') {
+          setQRCodeURI(provider.qrUrl);
+        } else {
+          const uri = await new Promise<string>((resolve) =>
+            provider.once('display_uri', resolve),
+          );
+
+          setQRCodeURI(uri);
+        }
 
         /**
          * This will ensure that we create a new connection instance
@@ -137,8 +138,6 @@ const ScanScreen = () => {
         provider.connector?.on('disconnect', () => {
           connect({connector});
         });
-
-        cleanupConnection(provider);
       });
     } catch (error) {
       console.error(

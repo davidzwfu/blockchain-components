@@ -6,10 +6,10 @@ import {
   UseTranslationOptions,
 } from 'react-i18next';
 
-import {i18n} from '../providers/TokengateProvider';
+import {i18n} from '~/providers/I18nProvider';
 
 export function useTranslation(
-  namespace: Namespace,
+  namespace?: Namespace,
   options?: UseTranslationOptions,
 ) {
   return useI18nTranslation(namespace, {...options, i18n});

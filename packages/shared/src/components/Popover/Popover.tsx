@@ -8,6 +8,7 @@ import {
 import {ReactNode} from 'react';
 import {createPortal} from 'react-dom';
 
+import {useIsMounted} from '../../hooks/useIsMounted';
 import {useMediaQuery} from '../../hooks/useMediaQuery';
 import {ClassName} from '../../types/generic';
 
@@ -36,8 +37,13 @@ export const Popover = ({
   target,
   visible,
 }: PopoverProps) => {
+  const isMounted = useIsMounted();
   const isMobile = useMediaQuery('smDown');
   const reducedMotion = useReducedMotion();
+
+  if (!isMounted) {
+    return null;
+  }
 
   const portalElement = isMobile
     ? document.body
@@ -59,7 +65,7 @@ export const Popover = ({
       <AnimatePresence>
         {visible ? (
           <m.div
-            className={`sbc-fixed sbc-top-0 sbc-bottom-0 sbc-right-0 sbc-z-max sbc-flex sbc-min-w-full sbc-flex-col sbc-justify-end sbc-p-0 sm:sbc-absolute sm:sbc-top-full sm:sbc-bottom-auto sm:sbc-py-1 ${containerClass}`}
+            className={`sbc-fixed sbc-bottom-0 sbc-right-0 sbc-top-0 sbc-z-max sbc-flex sbc-min-w-full sbc-flex-col sbc-justify-end sbc-p-0 sm:sbc-absolute sm:sbc-bottom-auto sm:sbc-top-full sm:sbc-py-1 ${containerClass}`}
             exit={{pointerEvents: 'none'}}
             id={id}
             initial={{pointerEvents: 'auto'}}

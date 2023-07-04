@@ -3,9 +3,10 @@ import {defineConfig, Options} from 'tsup';
 
 const BASE_CONFIG: Options = {
   entry: ['./src/index.ts'],
-  external: ['ethers', 'react', 'wagmi'],
+  external: ['react', 'viem', 'wagmi'],
   format: ['esm'],
   platform: 'browser',
+  sourcemap: true,
   target: 'esnext',
 };
 
@@ -18,5 +19,8 @@ export default defineConfig(
         ...BASE_CONFIG,
         clean: true,
         dts: true,
+        env: {
+          NODE_ENV: 'production',
+        },
       },
 );

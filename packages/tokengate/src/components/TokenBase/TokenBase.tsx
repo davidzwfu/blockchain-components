@@ -11,12 +11,15 @@ import {
 
 import {Link} from '../Link';
 
-import {useTranslation} from '../../hooks/useTranslation';
-import {LinkType} from '../../types';
+import {useTranslation} from '~/hooks/useTranslation';
+import {LinkType} from '~/types';
 
 interface TokenBaseProps {
   badge?: React.ReactNode;
-  icon: React.ReactNode;
+  image: {
+    alt: string;
+    url?: string;
+  };
   links?: LinkType[];
   rightContent?: React.ReactNode;
   round: boolean;
@@ -26,7 +29,7 @@ interface TokenBaseProps {
 
 export const TokenBase = ({
   badge,
-  icon,
+  image,
   links,
   rightContent,
   round,
@@ -51,8 +54,14 @@ export const TokenBase = ({
       togglePopover();
     }
   }, [escPress, popoverVisible, togglePopover]);
+
   return (
-    <div className="sbc-relative" id={wrapperId} ref={ref}>
+    <div
+      className="sbc-relative"
+      data-testid="tokenbase"
+      id={wrapperId}
+      ref={ref}
+    >
       <div className="sbc-flex sbc-w-full sbc-flex-row sbc-items-center sbc-gap-x-3">
         <div className="sbc-relative sbc-h-12 sbc-w-12">
           <div
@@ -60,11 +69,22 @@ export const TokenBase = ({
               round ? 'sbc-rounded-full' : 'sbc-rounded'
             }`}
           >
-            {icon}
+            {image.url ? (
+              <img
+                alt={image.alt}
+                className="sbc-h-full sbc-w-full sbc-object-cover"
+                src={image.url}
+              />
+            ) : (
+              <div className="sbc-h-full sbc-w-full sbc-bg-skeleton" />
+            )}
           </div>
 
           {badge ? (
-            <div className="sbc-absolute sbc-right-[-2px] sbc-bottom-[-2px] sbc-rounded-full sbc-bg-tokengate sbc-leading-none">
+            <div
+              className="sbc-absolute sbc-bottom-[-2px] sbc-right-[-2px] sbc-rounded-full sbc-bg-tokengate sbc-leading-none"
+              data-testid="tokenbase-badge"
+            >
               {badge}
             </div>
           ) : null}
@@ -72,8 +92,8 @@ export const TokenBase = ({
 
         <div className="sbc-flex-grow">
           <Text
-            as="p"
-            className="sbc-capitalize"
+            as="span"
+            className="sbc-block sbc-capitalize"
             color="primary"
             variant="bodyLg"
           >

@@ -16,17 +16,21 @@ import {
 } from 'shared';
 
 import {ConnectorIcon} from '../ConnectorIcon';
-import {useAppDispatch, useAppSelector} from '../../hooks/useAppState';
-import {useCopyToClipboard} from '../../hooks/useCopyToClipboard';
-import {useDisconnect} from '../../hooks/useDisconnect';
-import {useTranslation} from '../../hooks/useTranslation';
-import {useWindowDimensions} from '../../hooks/useWindowDimensions';
-import {openModal} from '../../slices/modalSlice';
 import {VaultList} from '../VaultList';
 
-export const ConnectButton = () => {
-  const dispatch = useAppDispatch();
-  const {activeWallet} = useAppSelector((state) => state.wallet);
+import {
+  useCopyToClipboard,
+  useDisconnect,
+  useTranslation,
+  useWindowDimensions,
+} from '~/hooks';
+import {useStore} from '~/state';
+
+export const ConnectButton = ({label}: {label?: string}) => {
+  const [{openModal}, {activeWallet}] = useStore((state) => [
+    state.modal,
+    state.wallet,
+  ]);
   const {copy, copied} = useCopyToClipboard();
   const {disconnect} = useDisconnect();
   const [popoverVisible, setPopoverVisible] = useState(false);
@@ -51,9 +55,9 @@ export const ConnectButton = () => {
 
   const handleClick = useCallback(() => {
     if (!activeWallet) {
-      dispatch(openModal());
+      openModal();
     }
-  }, [activeWallet, dispatch]);
+  }, [activeWallet, openModal]);
 
   const handleDisconnect = useCallback(() => {
     if (!activeWallet) {
@@ -72,10 +76,10 @@ export const ConnectButton = () => {
   if (!activeWallet) {
     return (
       <Button
-        aria-label={t('buttonText')}
+        aria-label={label || t('buttonText')}
         fullWidth
         primary
-        label={t('buttonText')}
+        label={label || t('buttonText')}
         onClick={handleClick}
         onClickEventName={eventNames.CONNECT_WALLET_CONNECT_BUTTON_CLICKED}
         size="Lg"
@@ -135,7 +139,7 @@ export const ConnectButton = () => {
         <ConnectorIcon id={connectorId} size="lg" />
 
         <button
-          className="sbc-flex sbc-cursor-pointer sbc-items-center sbc-gap-x-3 sbc-rounded-full sbc-bg-address-chip sbc-py-2 sbc-px-3 sbc-text-address-chip sbc-transition-colors sbc-border-none hover:sbc-bg-address-chip-hover"
+          className="sbc-flex sbc-cursor-pointer sbc-items-center sbc-gap-x-3 sbc-rounded-full sbc-bg-address-chip sbc-px-3 sbc-py-2 sbc-text-address-chip sbc-transition-colors sbc-border-none hover:sbc-bg-address-chip-hover"
           onClick={() => copy(address)}
           type="button"
         >

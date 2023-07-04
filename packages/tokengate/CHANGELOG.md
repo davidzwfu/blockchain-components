@@ -1,5 +1,54 @@
 # @shopify/tokengate
 
+## 1.1.1
+
+### Patch Changes
+
+- [#203](https://github.com/Shopify/blockchain-components/pull/203) [`7b16197`](https://github.com/Shopify/blockchain-components/commit/7b1619732dc0d2ce21fca234c311811127fcb675) Thanks [@QuintonC](https://github.com/QuintonC)! - Addresses a minor bug with a lack of unique keys on mapped elements
+
+## 1.1.0
+
+### Minor Changes
+
+- [#185](https://github.com/Shopify/blockchain-components/pull/185) [`7dddd29`](https://github.com/Shopify/blockchain-components/commit/7dddd29c8a22b89161f12c339f4f919a7e401929) Thanks [@QuintonC](https://github.com/QuintonC)! - This release adds support for providing custom dynamic values into the `discountCustomTitles` prop.
+
+  Using `{{value}}` will ensure that the discount value is entered into the custom title and formatted as expected.
+
+### Patch Changes
+
+- [#191](https://github.com/Shopify/blockchain-components/pull/191) [`4fd5ab4`](https://github.com/Shopify/blockchain-components/commit/4fd5ab434d99e65c1902789be77f1728a77ce8be) Thanks [@QuintonC](https://github.com/QuintonC)! - A bug was patched for the Popover component and its use of document.body which was causing errors in some frameworks.
+
+- [#193](https://github.com/Shopify/blockchain-components/pull/193) [`baeaf5f`](https://github.com/Shopify/blockchain-components/commit/baeaf5f39fa6f68bf9d09505d12097f89588f88a) Thanks [@QuintonC](https://github.com/QuintonC)! - Addresses a style collision with TailwindCSS preflight plugin where the background styles of buttons are removed.
+
+- [#190](https://github.com/Shopify/blockchain-components/pull/190) [`256b4df`](https://github.com/Shopify/blockchain-components/commit/256b4dfb0b221b167ba93589add3c7d48cb39e8a) Thanks [@QuintonC](https://github.com/QuintonC)! - Removed i18n context debug logging in non-development environments.
+
+- [#189](https://github.com/Shopify/blockchain-components/pull/189) [`e97ea85`](https://github.com/Shopify/blockchain-components/commit/e97ea85ed00311c7cea932beecfa8d7279346d61) Thanks [@QuintonC](https://github.com/QuintonC)! - This patch addresses an issue where the package was not setting the `NODE_ENV` variable during compile, resulting in unexpected behavior when utilizing the `process.env.NODE_ENV` value to add conditional functionality.
+
+- Updated dependencies [[`e97ea85`](https://github.com/Shopify/blockchain-components/commit/e97ea85ed00311c7cea932beecfa8d7279346d61)]:
+  - @shopify/blockchain-components@1.0.1
+
+## 1.0.5
+
+### Patch Changes
+
+- [#181](https://github.com/Shopify/blockchain-components/pull/181) [`86c4bbd`](https://github.com/Shopify/blockchain-components/commit/86c4bbd273c81964110c1f58ff07ee8484f63512) Thanks [@QuintonC](https://github.com/QuintonC)! - Updates tokengate error text to utilize `requirements.conditions` and assess whether to use a plural or singular string.
+
+## 1.0.4
+
+### Patch Changes
+
+- [#174](https://github.com/Shopify/blockchain-components/pull/174) [`af72d56`](https://github.com/Shopify/blockchain-components/commit/af72d56cb52cf686643674406e61f0f839cfcd1a) Thanks [@caropinzonsilva](https://github.com/caropinzonsilva)! - Adds formatting to the discount value. If the discount is type `fixedAmount`, we format to two decimal places. If the discount is type `percentage`, we remove any decimals.
+
+  Adds support for `string` values to the reaction type discounts.
+
+## 1.0.3
+
+### Patch Changes
+
+- [#170](https://github.com/Shopify/blockchain-components/pull/170) [`5a89047`](https://github.com/Shopify/blockchain-components/commit/5a89047f85688c6d4387b44ab01df2b9ac4e44a9) Thanks [@QuintonC](https://github.com/QuintonC)! - This update adjusts the text color for the `active.end` prop and also removes the year from the text string when the year provided more than 90 days in the future and not the current year.
+
+- [#163](https://github.com/Shopify/blockchain-components/pull/163) [`ca5c1a5`](https://github.com/Shopify/blockchain-components/commit/ca5c1a57568fa83441da2039be18cb8257a7d60f) Thanks [@QuintonC](https://github.com/QuintonC)! - Adds support for `active.end` prop to display an additional text element underneath the provided ConnectButton with detailed information about when the tokengate's benefits will end.
+
 ## 1.0.2
 
 ### Patch Changes

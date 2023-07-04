@@ -1,14 +1,17 @@
-import {Chain} from '@wagmi/core';
 import {createContext} from 'react';
-
-import {Connector} from '../../types/connector';
-import {OrderAttributionMode} from '../../types/orderAttribution';
+import {Chain} from 'wagmi';
 
 import {StatementGenerator} from './types';
+
+import {Connector} from '~/types/connector';
+import {OrderAttributionMode} from '~/types/orderAttribution';
 
 export interface ConnectWalletProviderValue {
   chains: Chain[];
   connectors: Connector[];
+  customTitles?: {
+    connectScreenHeader?: string;
+  };
   enableDelegateCash?: boolean;
   requireSignature?: boolean;
   statementGenerator?: StatementGenerator;

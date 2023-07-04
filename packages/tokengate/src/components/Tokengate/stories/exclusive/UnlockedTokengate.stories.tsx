@@ -1,11 +1,12 @@
 import {Meta, StoryObj} from '@storybook/react';
 
-import {Template} from '../template';
+import {defaultCustomExclusiveAccessTitles, Template} from '../template';
+
 import {
   TokengatePropsUnlockedFixture,
   TokengatePropsUnlockedWithOrderLimitFixture,
   TokengatePropsUnlockedWithOrderLimitMetFixture,
-} from '../../../../fixtures';
+} from '~/fixtures';
 
 const TokengateStory: Meta<typeof Template> = {
   title: 'Tokengate/Exclusive/Unlocked',
@@ -15,15 +16,19 @@ const TokengateStory: Meta<typeof Template> = {
 type Story = StoryObj<typeof Template>;
 
 export const NoOrderLimit: Story = {
-  args: TokengatePropsUnlockedFixture(),
+  args: TokengatePropsUnlockedFixture(defaultCustomExclusiveAccessTitles),
 };
 
 export const OrderLimit: Story = {
-  args: TokengatePropsUnlockedWithOrderLimitFixture(),
+  args: TokengatePropsUnlockedWithOrderLimitFixture(
+    defaultCustomExclusiveAccessTitles,
+  ),
 };
 
 export const OrderLimitReached: Story = {
-  args: TokengatePropsUnlockedWithOrderLimitMetFixture(),
+  args: TokengatePropsUnlockedWithOrderLimitMetFixture(
+    defaultCustomExclusiveAccessTitles,
+  ),
 };
 
 export default TokengateStory;

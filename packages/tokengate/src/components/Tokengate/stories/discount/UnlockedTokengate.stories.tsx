@@ -1,12 +1,13 @@
 import {Meta, StoryObj} from '@storybook/react';
 
-import {Template} from '../template';
+import {defaultCustomDiscountTitles, Template} from '../template';
+
 import {
   TokengatePropsUnlockedFixture,
   TokengatePropsUnlockedWithOrderLimitFixture,
   TokengatePropsUnlockedWithOrderLimitMetFixture,
   DiscountReactionFixture,
-} from '../../../../fixtures';
+} from '~/fixtures';
 
 const TokengateStory: Meta<typeof Template> = {
   title: 'Tokengate/Discount/Unlocked',
@@ -18,18 +19,21 @@ type Story = StoryObj<typeof Template>;
 export const NoOrderLimit: Story = {
   args: TokengatePropsUnlockedFixture({
     reaction: DiscountReactionFixture(),
+    ...defaultCustomDiscountTitles,
   }),
 };
 
 export const OrderLimit: Story = {
   args: TokengatePropsUnlockedWithOrderLimitFixture({
     reaction: DiscountReactionFixture(),
+    ...defaultCustomDiscountTitles,
   }),
 };
 
 export const OrderLimitReached: Story = {
   args: TokengatePropsUnlockedWithOrderLimitMetFixture({
     reaction: DiscountReactionFixture(),
+    ...defaultCustomDiscountTitles,
   }),
 };
 

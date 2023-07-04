@@ -5,16 +5,15 @@ import {
 } from '@shopify/blockchain-components';
 import {ReactNode, Fragment, useMemo, useEffect} from 'react';
 
-import {AvailableSoonButton} from '../AvailableSoonButton';
+import {ButtonWrapper} from '../ButtonWrapper';
 import {Card} from '../Card';
 import {Error} from '../Error';
-import {SoldOutButton} from '../SoldOutButton';
 import {TokengateRequirements} from '../TokengateRequirements';
 import {UnlockingTokens} from '../UnlockingTokens';
-import {useTranslation} from '../../hooks/useTranslation';
-import {TokengateProps} from '../../types';
 
-import {TokengateCardSection, useTokengateCardState} from './utils';
+import {useTokengateCardState, useTranslation} from '~/hooks';
+import {I18nProvider} from '~/providers/I18nProvider';
+import {TokengateCardSection, TokengateProps} from '~/types';
 
 export const Tokengate = (props: TokengateProps) => {
   const {t} = useTranslation('Tokengate');
@@ -31,18 +30,34 @@ export const Tokengate = (props: TokengateProps) => {
 
   // Analytics
   useComponentRenderedTracking(eventNames.TOKENGATE_COMPONENT_RENDERED);
+
   useEffect(() => {
-    if (!isLocked) publishEvent(eventNames.TOKENGATE_ON_UNLOCK_EVENT);
+    if (!isLocked) {
+      publishEvent(eventNames.TOKENGATE_ON_UNLOCK_EVENT);
+    }
   }, [isLocked]);
+
   useEffect(() => {
-    if (hasRequirementsNotMet)
+    if (hasRequirementsNotMet) {
       publishEvent(eventNames.TOKENGATE_ON_REQUIREMENTS_NOT_MET_EVENT);
+    }
   }, [hasRequirementsNotMet]);
 
   const sectionMapping: {[key in TokengateCardSection]: ReactNode} = useMemo(
     () => ({
-      [TokengateCardSection.ConnectWallet]: connectButton,
-      [TokengateCardSection.ConnectedWallet]: connectedButton ?? connectButton,
+      [TokengateCardSection.ConnectWallet]: (
+        <ButtonWrapper
+          button={connectButton}
+          text={
+            active?.end
+              ? {key: 'activeEnd', value: new Date(active.end)}
+              : undefined
+          }
+          textColor="secondary"
+          translationNamespace="Buttons"
+        />
+      ),
+      [TokengateCardSection.ConnectedWallet]: connectedButton || connectButton,
       [TokengateCardSection.UnlockingTokens]: (
         <UnlockingTokens
           unlockingTokens={unlockingTokens}
@@ -60,9 +75,28 @@ export const Tokengate = (props: TokengateProps) => {
         />
       ),
       [TokengateCardSection.AvailableSoon]: (
-        <AvailableSoonButton availableDate={active?.start} />
+        <ButtonWrapper
+          button={{
+            disabled: true,
+            label: {
+              key: 'activeStart',
+              value: active?.start ? new Date(active.start) : undefined,
+            },
+          }}
+          translationNamespace="Buttons"
+        />
       ),
-      [TokengateCardSection.SoldOut]: <SoldOutButton />,
+      [TokengateCardSection.SoldOut]: (
+        <ButtonWrapper
+          button={{
+            disabled: true,
+            label: {key: 'soldOutLabel'},
+          }}
+          text={{key: 'soldOutDescription'}}
+          textColor="secondary"
+          translationNamespace="Buttons"
+        />
+      ),
       [TokengateCardSection.TokengateRequirementSkeleton]: (
         <TokengateRequirements isLoading />
       ),
@@ -70,25 +104,35 @@ export const Tokengate = (props: TokengateProps) => {
         <Error text={t('errors.orderLimitReachedError') as string} />
       ),
       [TokengateCardSection.MissingTokensError]: (
-        <Error text={t('errors.missingTokensError') as string} />
+        <Error
+          text={
+            requirements?.conditions &&
+            requirements.conditions.length > 1 &&
+            requirements.logic === 'ALL'
+              ? (t('errors.missingTokensError_other') as string)
+              : (t('errors.missingTokensError_singular') as string)
+          }
+        />
       ),
     }),
     [
-      active?.start,
+      active,
       connectButton,
       connectedButton,
-      requirements,
-      t,
-      unlockingTokens,
       redemptionLimit,
+      requirements,
+      unlockingTokens,
+      t,
     ],
   );
 
   return (
-    <Card title={title as string} subtitle={subtitle as string}>
-      {sections.map((section: TokengateCardSection) => (
-        <Fragment key={section}>{sectionMapping[section]}</Fragment>
-      ))}
-    </Card>
+    <I18nProvider>
+      <Card title={title as string} subtitle={subtitle as string}>
+        {sections.map((section: TokengateCardSection) => (
+          <Fragment key={section}>{sectionMapping[section]}</Fragment>
+        ))}
+      </Card>
+    </I18nProvider>
   );
 };

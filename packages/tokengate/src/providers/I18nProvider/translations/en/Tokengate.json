@@ -1,0 +1,30 @@
+{
+  "exclusive": {
+    "locked": {
+      "title": "Holder exclusive",
+      "subtitle": "To unlock this product, you need:"
+    },
+    "unlocked": {
+      "title": "Exclusive unlocked",
+      "subtitle": "Your token got you access to this product!",
+      "subtitleWithOrderLimit": "You can buy up to {{count}} with your tokens."
+    }
+  },
+  "discount": {
+    "locked": {
+      "title": "{{value}} holder discount",
+      "subtitle": "To unlock this discount, you need:"
+    },
+    "unlocked": {
+      "title": "{{value}} discount unlocked",
+      "subtitle": "Your token got you access to this discount!",
+      "subtitleWithOrderLimit_one": "You can use this discount up to {{count}} time with your tokens.",
+      "subtitleWithOrderLimit_other": "You can use this discount up to {{count}} times with your tokens."
+    }
+  },
+  "errors": {
+    "orderLimitReachedError": "You reached your order limit.\nDisconnect to try another wallet.",
+    "missingTokensError_singular": "You don't have a required token.\nDisconnect to try another wallet.",
+    "missingTokensError_other": "You don't have all required tokens.\nDisconnect to try another wallet."
+  }
+}

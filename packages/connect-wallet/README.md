@@ -2,53 +2,58 @@
 
 [![npm version](https://img.shields.io/npm/v/@shopify/connect-wallet.svg?label=@shopify/connect-wallet)](https://www.npmjs.com/package/@shopify/connect-wallet) [![CI](https://github.com/Shopify/blockchain-components/actions/workflows/ci.yml/badge.svg)](https://github.com/Shopify/blockchain-components/actions?query=branch%3Amain) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](../../.github/contributing.md)
 
-The `@shopify/connect-wallet` package provides a standard way of connecting wallets and signing messages on Shopify storefronts. For more in-depth information, [read the complete documentation](https://shopify.dev/api/blockchain/components/connect-wallet).
+The `@shopify/connect-wallet` package provides an opinionated and delightful way of connecting wallets and signing messages. The provided package and functionality is suitable for use on and off of Shopify.
+
+For more in-depth information and API references, [read the complete documentation](https://shopify.dev/api/blockchain/components/connect-wallet).
 
 ## Installation
 
-Install the `shopify/connect-wallet` package and its wagmi + ethers peer dependencies.
+Install the `@shopify/connect-wallet` package and its wagmi + viem peer dependencies.
 
 ```bash
-yarn add @shopify/connect-wallet ethers wagmi
+yarn add @shopify/connect-wallet viem wagmi
 ```
 
 ## Documentation
 
 ### Client configuration
 
-We recommend creating a new file at the root of your app.
+1. To get started, you'll need to retrieve a Project ID from [WalletConnect](https://walletconnect.com). Find your Project ID [here](https://cloud.walletconnect.com/sign-in).
+2. Begin by creating a new file at the root of your app named `connect-wallet-config.ts`.
+3. Paste the following code into your newly created file:
 
-Create a file in your project titled `connect-wallet-config.ts` at the root of your app with the following code. For more information, refer to [wagmi documentation](https://wagmi.sh).
+    ```ts
+    import {buildConnectors} from '@shopify/connect-wallet';
+    import {configureChains, createConfig, mainnet} from 'wagmi';
+    // import {alchemyProvider} from 'wagmi/providers/alchemy';
+    import {publicProvider} from 'wagmi/providers/public';
 
-```ts
-import {buildConnectors} from '@shopify/connect-wallet';
-import {configureChains, createClient} from 'wagmi';
-import {mainnet} from 'wagmi/chains';
-/**
- * It is strongly recommended to make use of `alchemyProvider`
- * or `infuraProvider` to reduce the risk of your
- * storefront being rate limited.
- */
-// import {alchemyProvider} from 'wagmi/providers/alchemy';
-import {publicProvider} from 'wagmi/providers/public';
-const {chains, provider, webSocketProvider} = configureChains(
-  [mainnet],
-  [
-    // alchemyProvider({apiKey: 'INSERT API KEY HERE'}),
-    publicProvider(),
-  ],
-);
-const {connectors, wagmiConnectors} = buildConnectors({
-  chains,
-});
-const client = createClient({
-  autoConnect: true,
-  connectors: wagmiConnectors,
-  provider,
-  webSocketProvider,
-});
-export {chains, client, connectors};
-```
+    const {chains, publicClient, webSocketPublicClient} = configureChains(
+      [mainnet],
+      [
+        /**
+         * We recommend using `alchemyProvider or `infuraProvider`
+        * to reduce the risk of your application being rate limited.
+        */
+        // alchemyProvider({apiKey: 'INSERT API KEY HERE'}),
+        publicProvider(),
+      ],
+    );
+
+    const {connectors, wagmiConnectors} = buildConnectors({
+      chains,
+      projectId: 'YOUR_WALLET_CONNECT_PROJECT_ID',
+    });
+
+    const config = createConfig({
+      autoConnect: true,
+      connectors: wagmiConnectors,
+      publicClient,
+      webSocketPublicClient,
+    });
+
+    export {chains, config, connectors};
+    ```
 
 ### App provider setup
 
@@ -59,11 +64,11 @@ import {ConnectWalletProvider} from '@shopify/connect-wallet';
 import '@shopify/connect-wallet/styles.css';
 import {WagmiConfig} from 'wagmi';
 
-import {chains, client, connectors} from './connect-wallet-config'
+import {chains, config, connectors} from './wagmi';
 
 export function Index() {
   return (
-    <WagmiConfig client={client}>
+    <WagmiConfig config={config}>
       <ConnectWalletProvider chains={chains} connectors={connectors}>
         /* {...your app content here} */
       </ConnectWalletProvider>
@@ -92,9 +97,9 @@ export const Header = () => {
 }
 ```
 
-For further detailed documentation, [visit shopify.dev](https://shopify.dev/docs/api/blockchain/components/connect-wallet).
+## Examples
 
-For examples of component usage, see the [examples folder](https://github.com/Shopify/blockchain-components/tree/main/examples).
+For examples of component usage in various frameworks, see the [examples folder](https://github.com/Shopify/blockchain-components/tree/main/examples).
 
 ## Contributing
 

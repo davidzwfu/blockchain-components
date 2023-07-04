@@ -1,5 +1,101 @@
 # @shopify/connect-wallet
 
+## 3.0.0
+
+### Major Changes
+
+- [#7](https://github.com/Shopify/blockchain-components/pull/7) [`b49ba23`](https://github.com/Shopify/blockchain-components/commit/b49ba23a8189ffd588d8d83cfe7c8dfb2d60befc) Thanks [@QuintonC](https://github.com/QuintonC)! - This change include the following updates:
+
+  - All usage of WalletConnect v1 connectors have been replaced with v2 connectors. [Read more about the deprecation of WalletConnect v1](https://medium.com/walletconnect/t-1-month-last-call-to-migrate-before-the-walletconnect-v1-0-shutdown-692ffa9520aa).
+  - `buildConnectors` function now requires an additional prop, `projectId`.
+  - Any usage which does not provide connectors to the `ConnectWalletProvider` will no longer operate as expected. Previously, the package would build the connectors in place for you. This is no longer the case as we cannot provide a WalletConnect v2 `projectId` to create the fallback and mobile connectors in place for your instance. You **must** provide connectors to the context provider in order for the package to function.
+  - The `getDefaultConnectors` function has been removed in favor of using `buildConnectors`.
+
+  To update your instance, please ensure that any usage of `buildConnectors` includes a `projectId` value with a valid WalletConnect `projectId`.
+
+  To obtain a WalletConnect `projectId`, visit the [WalletConnect cloud portal](https://cloud.walletconnect.com/sign-in).
+
+  To migrate, make the following changes:
+
+  ```diff
+  import {buildConnectors} from '@shopify/connect-wallet';
+  import {configureChains, createConfig, mainnet} from 'wagmi';
+  import {publicProvider} from 'wagmi/providers/public';
+
+  const {chains, publicClient, webSocketPublicClient} = configureChains(
+    [mainnet],
+    [publicProvider()],
+  );
+
+  const {connectors, wagmiConnectors} = buildConnectors({
+    chains,
+  + projectId: "YOUR_PROJECT_ID"
+  });
+
+  const config = createConfig({
+    autoConnect: true,
+    connectors: wagmiConnectors,
+    publicClient,
+    webSocketPublicClient,
+  });
+
+  export {chains, config, connectors};
+  ```
+
+### Patch Changes
+
+- [#205](https://github.com/Shopify/blockchain-components/pull/205) [`2e7f87e`](https://github.com/Shopify/blockchain-components/commit/2e7f87ea932b3a21abe6b55490b75df75a960bab) Thanks [@QuintonC](https://github.com/QuintonC)! - This patch addresses a minor bug relating to state cleanup when a modal is closed. Prior to this patch, an issue was present when closing the modal that would leave the state visible. This was an issue particularly when the user was connecting with a connector which was based on WalletConnect as the QR Code would be cleared. This addresses that by calling the `reset` state method which will clear the modal state and properly. In addition, functionality to handle disconnect events during signature flows was added for modal close events.
+
+## 2.0.0
+
+### Major Changes
+
+- [#176](https://github.com/Shopify/blockchain-components/pull/176) [`cc7d7fc`](https://github.com/Shopify/blockchain-components/commit/cc7d7fc06e871f9e26baa5edd0c160ca51716939) Thanks [@QuintonC](https://github.com/QuintonC)! - This update includes a dependency upgrade from wagmi@0.10.4 to wagmi@1. As part of this upgrade, we no longer make use of the ethers package, but instead make use of [viem](https://viem.sh).
+
+## 1.3.1
+
+### Patch Changes
+
+- [#199](https://github.com/Shopify/blockchain-components/pull/199) [`74ec3db`](https://github.com/Shopify/blockchain-components/commit/74ec3dba105bae93e58d9091df61fa10742801d0) Thanks [@QuintonC](https://github.com/QuintonC)! - Addressed a minor bug where after connecting, if an attempt to reconnect without refreshing occurs the modal would show a connecting state rather than a clean state.
+
+## 1.3.0
+
+### Minor Changes
+
+- [#196](https://github.com/Shopify/blockchain-components/pull/196) [`9700f25`](https://github.com/Shopify/blockchain-components/commit/9700f255a842b3e38b21d47cfb610cde971a5db8) Thanks [@QuintonC](https://github.com/QuintonC)! - Removes usage of Redux and Redux Toolkit in favor of a non-contextual state management package.
+
+### Patch Changes
+
+- [#191](https://github.com/Shopify/blockchain-components/pull/191) [`4fd5ab4`](https://github.com/Shopify/blockchain-components/commit/4fd5ab434d99e65c1902789be77f1728a77ce8be) Thanks [@QuintonC](https://github.com/QuintonC)! - A bug was patched for the Popover component and its use of document.body which was causing errors in some frameworks.
+
+- [#193](https://github.com/Shopify/blockchain-components/pull/193) [`baeaf5f`](https://github.com/Shopify/blockchain-components/commit/baeaf5f39fa6f68bf9d09505d12097f89588f88a) Thanks [@QuintonC](https://github.com/QuintonC)! - Addresses a style collision with TailwindCSS preflight plugin where the background styles of buttons are removed.
+
+- [#190](https://github.com/Shopify/blockchain-components/pull/190) [`256b4df`](https://github.com/Shopify/blockchain-components/commit/256b4dfb0b221b167ba93589add3c7d48cb39e8a) Thanks [@QuintonC](https://github.com/QuintonC)! - Removed i18n context debug logging in non-development environments.
+
+- [#189](https://github.com/Shopify/blockchain-components/pull/189) [`e97ea85`](https://github.com/Shopify/blockchain-components/commit/e97ea85ed00311c7cea932beecfa8d7279346d61) Thanks [@QuintonC](https://github.com/QuintonC)! - This patch addresses an issue where the package was not setting the `NODE_ENV` variable during compile, resulting in unexpected behavior when utilizing the `process.env.NODE_ENV` value to add conditional functionality.
+
+- Updated dependencies [[`e97ea85`](https://github.com/Shopify/blockchain-components/commit/e97ea85ed00311c7cea932beecfa8d7279346d61)]:
+  - @shopify/blockchain-components@1.0.1
+  - @shopify/gate-context-client@1.0.1
+
+## 1.2.1
+
+### Patch Changes
+
+- [#182](https://github.com/Shopify/blockchain-components/pull/182) [`34d96d0`](https://github.com/Shopify/blockchain-components/commit/34d96d03cabcac3985a4fdfa91b97e2266b8cb74) Thanks [@QuintonC](https://github.com/QuintonC)! - Addressed a minor bug that would close the connection modal when navigating back during a signature flow.
+
+## 1.2.0
+
+### Minor Changes
+
+- [#172](https://github.com/Shopify/blockchain-components/pull/172) [`6915e32`](https://github.com/Shopify/blockchain-components/commit/6915e3269cdf0d972af5fa9d6a42bed1fc0457fd) Thanks [@caropinzonsilva](https://github.com/caropinzonsilva)! - Adds optional `label` to ConnectButton in `connect-wallet` package that will overwrite the default text.
+
+## 1.1.0
+
+### Minor Changes
+
+- [#169](https://github.com/Shopify/blockchain-components/pull/169) [`d5443e5`](https://github.com/Shopify/blockchain-components/commit/d5443e508e3effae71e95fcbd6371a73d72d003d) Thanks [@caropinzonsilva](https://github.com/caropinzonsilva)! - Adds new prop `customTitles` to ConnectWallet package that allows the developers to customize the modal header of the ConnectScreen.
+
 ## 1.0.2
 
 ### Patch Changes

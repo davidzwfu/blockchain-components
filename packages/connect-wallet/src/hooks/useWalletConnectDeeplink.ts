@@ -1,9 +1,8 @@
 import {useCallback} from 'react';
 
-import {Browser} from '../types/browser';
-import {Connector} from '../types/connector';
-import {cleanupConnection} from '../utils/cleanupConnection';
-import {getBrowserInfo} from '../utils/getBrowser';
+import {Browser} from '~/types/browser';
+import {Connector} from '~/types/connector';
+import {getBrowserInfo} from '~/utils/getBrowser';
 
 interface ItemProps {
   href: string;
@@ -66,28 +65,22 @@ export function useWalletConnectDeeplink() {
             return;
           }
 
-          // Set invoked to true to prevent duplicat event listeners from being attached.
+          // Set invoked to true to prevent duplicate event listeners from being attached.
           invoked = true;
 
           const provider = await wagmiConnector.getProvider();
-          const {uri} = provider.connector;
+
+          const uri = await new Promise<string>((resolve) =>
+            provider.once('display_uri', resolve),
+          );
+
           const suffix =
             mobilePlatform === 'Android' ? uri : encodeURIComponent(uri);
           const deeplinkUri = `${prefix}${suffix}`;
 
           if (mobilePlatform) {
             setKey({href: deeplinkUri, name});
-
-            // This addresses an issue with hanging tabs for iOS.
-            if (deeplinkUri.startsWith('http')) {
-              const link = document.createElement('a');
-              link.href = deeplinkUri;
-              link.target = '_blank';
-              link.rel = 'noreferrer noopener';
-              link.click();
-            } else {
-              window.location.href = deeplinkUri;
-            }
+            window.location.href = deeplinkUri;
           } else {
             /**
              * There is a slight UX gap here where if the user is on desktop
@@ -101,8 +94,6 @@ export function useWalletConnectDeeplink() {
               browser === Browser.Safari ? '_blank' : '_self',
             );
           }
-
-          cleanupConnection(provider);
         });
       } catch (error) {
         console.error(

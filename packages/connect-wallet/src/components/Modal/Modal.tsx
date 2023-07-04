@@ -20,14 +20,6 @@ import {
   useMediaQuery,
 } from 'shared';
 
-import {useAppDispatch, useAppSelector} from '../../hooks/useAppState';
-import {useDisconnect} from '../../hooks/useDisconnect';
-import {useMiddleware} from '../../hooks/useMiddleware';
-import {useTranslation} from '../../hooks/useTranslation';
-import {ConnectWalletContext} from '../../providers/ConnectWalletProvider';
-import {closeModal, goBack, navigate} from '../../slices/modalSlice';
-import {ModalRoute} from '../../types/modal';
-
 import {
   ConnectScreen,
   ConnectingScreen,
@@ -39,14 +31,19 @@ import {
 } from './Screens';
 import {ModalVariants} from './variants';
 
+import {useDisconnect, useMiddleware, useTranslation} from '~/hooks';
+import {ConnectWalletContext} from '~/providers/ConnectWalletProvider';
+import {useStore} from '~/state';
+import {ModalRoute} from '~/types/modal';
+
 export const Modal = () => {
-  const dispatch = useAppDispatch();
-  const {open, route} = useAppSelector((state) => state.modal);
-  const {pendingConnector, pendingWallet} = useAppSelector(
-    (state) => state.wallet,
-  );
+  const [
+    {goBack, navigate, open, reset, route},
+    {pendingConnector, pendingWallet},
+  ] = useStore((state) => [state.modal, state.wallet]);
   const {
     connectors,
+    customTitles,
     enableDelegateCash,
     orderAttributionMode,
     requireSignature,
@@ -63,9 +60,13 @@ export const Modal = () => {
 
   useEffect(() => {
     if (escPress && open) {
-      dispatch(closeModal());
+      if (route === 'Signature') {
+        disconnect(pendingWallet?.address);
+      }
+
+      reset();
     }
-  }, [dispatch, escPress, open]);
+  }, [disconnect, escPress, open, pendingWallet?.address, reset, route]);
 
   const handleCloseModal = useCallback(() => {
     if (!open) return;
@@ -74,16 +75,16 @@ export const Modal = () => {
       disconnect(pendingWallet?.address);
     }
 
-    dispatch(closeModal());
-  }, [disconnect, dispatch, open, pendingWallet?.address, route]);
+    reset();
+  }, [disconnect, open, pendingWallet?.address, reset, route]);
 
   const handleGoBack = useCallback(() => {
     if (route === 'Signature') {
       disconnect(pendingWallet?.address);
     }
 
-    dispatch(goBack());
-  }, [disconnect, dispatch, pendingWallet?.address, route]);
+    goBack();
+  }, [disconnect, goBack, pendingWallet?.address, route]);
 
   const backButton = (
     <IconButton
@@ -99,7 +100,7 @@ export const Modal = () => {
       aria-label={t('icons.whatIsAWallet') as string}
       icon={QuestionMark}
       onClickEventName={eventNames.CONNECT_WALLET_HELP_BUTTON_CLICKED}
-      onClick={() => dispatch(navigate('WhatAreWallets'))}
+      onClick={() => navigate('WhatAreWallets')}
     />
   );
 
@@ -115,7 +116,7 @@ export const Modal = () => {
           enableDelegateCash={enableDelegateCash}
         />
       ),
-      title: t('title.Connect'),
+      title: customTitles?.connectScreenHeader || t('title.Connect'),
     },
     Connecting: {
       leftButton: backButton,
@@ -160,7 +161,7 @@ export const Modal = () => {
       <AnimatePresence>
         {open ? (
           <m.div
-            className="sbc-fixed sbc-top-0 sbc-left-0 sbc-right-0 sbc-bottom-0 sbc-z-max sbc-flex sbc-items-end sbc-justify-center sm:sbc-items-center"
+            className="sbc-fixed sbc-bottom-0 sbc-left-0 sbc-right-0 sbc-top-0 sbc-z-max sbc-flex sbc-items-end sbc-justify-center sm:sbc-items-center"
             exit={{pointerEvents: 'none'}}
             id="shopify-connect-wallet-modal-container"
             initial={{pointerEvents: 'auto'}}
